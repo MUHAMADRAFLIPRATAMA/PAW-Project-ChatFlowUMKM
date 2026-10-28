@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>ChatFlow UMKM</title>
+  <style>
+    :root { font-family: "Segoe UI", Arial, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; color: #f8fafc; background: linear-gradient(135deg, #172554, #0f766e 55%, #164e63); }
+    .phone { max-width: 980px; min-height: 100vh; margin: auto; overflow: hidden; }
+    header { padding: 42px 28px 30px; background: rgba(255,255,255,.08); border-bottom: 1px solid rgba(255,255,255,.2); backdrop-filter: blur(14px); }
+    .status { display: none; }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .avatar { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4); font-size: 22px; font-weight: 700; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 30px; }
+    .subtitle { color: rgba(255,255,255,.72); font-size: 15px; margin-top: 4px; }
+    main { max-width: 760px; margin: auto; padding: 30px 20px 60px; }
+    .bubble { padding: 17px; margin-bottom: 16px; background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.2); border-radius: 16px; color: #fff; line-height: 1.5; font-size: 15px; backdrop-filter: blur(12px); }
+    .bubble strong { display: block; color: #a7f3d0; margin-bottom: 4px; }
+    .chat-log { display: grid; gap: 10px; margin-bottom: 14px; }
+    .chat-message { max-width: 86%; padding: 12px 14px; border-radius: 15px; line-height: 1.4; font-size: 14px; }
+    .chat-message.bot { background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.2); }
+    .chat-message.user { justify-self: end; background: #34d399; color: #064e3b; }
+    .chat-form { display: flex; gap: 8px; margin-bottom: 20px; }
+    .chat-input { min-width: 0; flex: 1; padding: 13px 14px; border: 1px solid rgba(255,255,255,.25); border-radius: 11px; outline: 0; background: rgba(255,255,255,.12); color: white; font: inherit; }
+    .chat-input::placeholder { color: rgba(255,255,255,.6); }
+    .chat-send { padding: 0 18px; border: 0; border-radius: 11px; background: #34d399; color: #064e3b; font-weight: 700; cursor: pointer; }
+    .menu, .panel { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,.12); backdrop-filter: blur(14px); }
+    .menu { padding: 8px 18px; margin-bottom: 20px; }
+    .choice { width: 100%; padding: 16px 0; border: 0; border-bottom: 1px solid rgba(255,255,255,.15); background: none; color: #fff; text-align: left; font: inherit; font-weight: 600; cursor: pointer; }
+    .choice:last-child { border-bottom: 0; color: rgba(255,255,255,.75); }
+    .panel { padding: 22px 18px; }
+    .panel h2 { font-size: 22px; }
+    .muted { color: rgba(255,255,255,.65); font-size: 14px; margin-top: 5px; }
+    .products { display: grid; gap: 12px; margin-top: 18px; }
+    article { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid rgba(255,255,255,.2); border-radius: 14px; background: rgba(255,255,255,.08); }
+    .product-img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; }
+    article h3 { font-size: 15px; margin: 5px 0; }
+    .category { color: rgba(255,255,255,.6); font-size: 12px; }
+    .price { color: #a7f3d0; font-size: 14px; font-weight: 700; }
+    .quantity { width: 52px; margin-left: auto; padding: 9px 5px; border: 1px solid rgba(255,255,255,.3); border-radius: 9px; background: rgba(255,255,255,.15); color: white; text-align: center; font-size: 16px; }
+    .primary { width: 100%; margin-top: 18px; padding: 14px; border: 0; border-radius: 11px; background: #34d399; color: #064e3b; font: inherit; font-weight: 700; cursor: pointer; }
+    ol { padding-left: 22px; line-height: 2; color: rgba(255,255,255,.85); }
+    .result { margin-top: 14px; padding: 14px; border-radius: 11px; background: rgba(167,243,208,.2); color: #a7f3d0; }
+    .hidden { display: none; }
+    footer { padding: 24px 0; color: rgba(255,255,255,.6); text-align: center; font-size: 12px; }
+    footer a { color: #a7f3d0; text-decoration: none; }
+    @media (min-width: 500px) { .phone { min-height: 100vh; } }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <header><div class="status"><span>9:41</span><span>● ● ▰</span></div><div class="brand"><div class="avatar">C</div><div><h1>ChatFlow UMKM</h1><p class="subtitle">Asisten pesanan kamu</p></div></div></header>
+    <main>
+      <div id="chatLog" class="chat-log"><div class="chat-message bot"><strong>ChatFlow Bot</strong>Halo! Saya siap membantu. Ketik <b>katalog</b>, <b>panduan</b>, atau <b>bantuan</b>.</div></div>
+      <form id="chatForm" class="chat-form"><input id="chatInput" class="chat-input" autocomplete="off" placeholder="Tulis pesan..." required><button class="chat-send" type="submit">Kirim</button></form>
+      <div class="menu"><button class="choice" data-target="catalog">Lihat katalog produk <span>›</span></button><button class="choice" data-target="guide">Panduan jualan online <span>›</span></button><button class="choice" data-target="help">Bantuan <span>›</span></button></div>
+      <section id="catalog" class="panel hidden"><h2>Pilih produk</h2><p class="muted">Langkah 1 dari 3 · pilih produk dan jumlahnya</p><div class="products"><% products.forEach(product => { %><article><img src="<%= product.image %>" class="product-img" alt="<%= product.name %>"><div><span class="category"><%= product.category %></span><h3><%= product.name %></h3><span class="price">Rp <%= product.price.toLocaleString('id-ID') %></span></div><input class="quantity" type="number" min="0" value="0" data-name="<%= product.name %>" data-price="<%= product.price %>"></article><% }) %></div><button id="calculate" class="primary">Lanjutkan pesanan</button><div id="result"></div></section>
+      <section id="guide" class="panel hidden"><h2>Panduan Jualan Online</h2><p class="muted">Tips singkat untuk mulai berjualan</p><ol><li>Foto produk dengan pencahayaan baik.</li><li>Tulis nama dan harga produk dengan jelas.</li><li>Bagikan katalog kepada calon pembeli.</li><li>Balas pesanan melalui alur ChatFlow.</li><li>Konfirmasi jumlah dan alamat pembeli.</li></ol></section>
+      <section id="help" class="panel hidden"><h2>Bantuan</h2><p class="muted">Pilih menu katalog untuk memulai pesanan. Chatbot ini menggunakan template jawaban agar proses tetap cepat.</p></section>
+      <footer>API: <a href="/api/status">status</a> · <a href="/api/produk">produk</a></footer>
+    </main>
+  </div>
+  <script>
+    const showSection = target => { document.querySelectorAll('section[id]').forEach(section => section.classList.add('hidden')); document.getElementById(target).classList.remove('hidden'); };
+    document.querySelectorAll('.choice').forEach(button => button.onclick = () => showSection(button.dataset.target));
+    document.getElementById('chatForm').onsubmit = async event => { event.preventDefault(); const input = document.getElementById('chatInput'); const button = document.querySelector('.chat-send'); const message = input.value.trim(); if (!message) return; const log = document.getElementById('chatLog'); const safe = value => value.replace(/[<>&]/g, character => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[character])); log.insertAdjacentHTML('beforeend', `<div class="chat-message user">${safe(message)}</div>`); input.value = ''; input.disabled = true; button.disabled = true; button.textContent = '...'; try { const response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ message }) }); const data = await response.json(); log.insertAdjacentHTML('beforeend', `<div class="chat-message bot">${safe(data.reply || data.message || 'Terjadi kesalahan.')}</div>`); } finally { input.disabled = false; button.disabled = false; button.textContent = 'Kirim'; input.focus(); } };
+    document.getElementById('calculate').onclick = async () => { const items = [...document.querySelectorAll('.quantity')].filter(input => input.value > 0).map(input => ({ name: input.dataset.name, price: Number(input.dataset.price), quantity: Number(input.value) })); const response = await fetch('/api/pesanan/hitung', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({items}) }); const order = await response.json(); document.getElementById('result').innerHTML = `<div class="result">Total pesanan: <strong>Rp ${order.total.toLocaleString('id-ID')}</strong><br><small>Langkah 3 dari 3 · pesanan siap dikonfirmasi.</small></div>`; };
+  </script>
+</body>
+</html>

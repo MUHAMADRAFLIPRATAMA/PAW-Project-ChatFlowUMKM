@@ -1,0 +1,19 @@
+{
+  "name": "paw7",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "test": "node -e \"const app = require('./app'); const http = require('http'); const server = app.listen(0, () => { const port = server.address().port; http.get({ port, path: '/api/produk' }, response => { let data = ''; response.on('data', chunk => data += chunk); response.on('end', () => { const products = JSON.parse(data); if (!Array.isArray(products)) process.exitCode = 1; server.close(); }); }); });\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "ejs": "^7.0.2",
+    "express": "^5.3.0"
+  }
+}

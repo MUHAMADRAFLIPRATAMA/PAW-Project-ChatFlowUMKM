@@ -5,39 +5,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kelola Produk</title>
   <style>
-    body { max-width: 1000px; margin: 30px auto; padding: 0 16px; font-family: Arial, sans-serif; color: #172033; }
-    h1 { margin-bottom: 8px; } a { color: #087f5b; }
-    form, .product { display: grid; gap: 10px; padding: 18px; margin: 16px 0; border: 1px solid #dce3ea; border-radius: 10px; }
-    form { grid-template-columns: repeat(4, 1fr) auto; background: #f5faf8; }
-    input { min-width: 0; padding: 10px; border: 1px solid #bbc7d1; border-radius: 6px; }
-    button { padding: 10px 14px; border: 0; border-radius: 6px; background: #087f5b; color: white; cursor: pointer; }
-    button.delete { background: #c92a2a; } .product { grid-template-columns: 70px 1fr auto; align-items: center; }
-    img { width: 70px; height: 70px; object-fit: cover; border-radius: 6px; } .actions { display: flex; gap: 8px; }
-    @media (max-width: 700px) { form { grid-template-columns: 1fr; } .product { grid-template-columns: 55px 1fr; } .product .actions { grid-column: 1 / -1; } img { width: 55px; height: 55px; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #eef4f9; color: #10243d; font-family: Arial, sans-serif; }
+    header { height: 91px; padding: 6px max(6%, 40px); color: white; background: linear-gradient(110deg, #24536d, #087d4d); }
+    header h1 { margin: 0 0 8px; font-size: 20px; font-weight: 400; }
+    header p { margin: 0; font-size: 16px; }
+    main { display: grid; grid-template-columns: 360px 1fr; gap: 22px; max-width: 1180px; margin: -34px auto 0; padding: 0 16px 40px; }
+    .card { padding: 22px; background: white; border: 1px solid #d6e1eb; border-radius: 18px; box-shadow: 0 14px 28px rgba(34, 63, 88, .08); }
+    h2 { margin: 0 0 20px; color: #214a78; font-size: 25px; }
+    label { display: block; margin: 0 0 7px; font-weight: 700; }
+    input, select, textarea { width: 100%; margin-bottom: 13px; padding: 11px 12px; border: 1px solid #bfcee0; border-radius: 12px; color: #172b43; font: inherit; }
+    textarea { min-height: 78px; resize: vertical; }
+    button { border: 0; border-radius: 13px; padding: 13px 16px; color: white; background: #264d79; font-weight: 700; cursor: pointer; }
+    form button { width: 100%; }
+    .reload { float: right; padding: 13px 18px; color: #172b43; background: #ffbb0d; }
+    .products { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .product { display: flex; min-height: 292px; flex-direction: column; padding: 16px; border: 1px solid #d2deeb; border-radius: 16px; }
+    .product img { width: 100%; height: 105px; margin-bottom: 12px; border-radius: 10px; object-fit: cover; }
+    .category { color: #64748b; font-size: 14px; }
+    .product h3 { margin: 12px 0 7px; color: #174778; font-size: 18px; }
+    .product p { min-height: 38px; margin: 0 0 12px; font-size: 14px; }
+    .price { margin-top: auto; color: #087d4d; font-size: 21px; font-weight: 700; }
+    .actions { margin-top: 12px; display: flex; gap: 8px; }
+    .actions button { padding: 10px 16px; background: #b51d25; }
+    .actions .edit { background: #264d79; }
+    .empty { color: #64748b; }
+    @media (max-width: 850px) { main { grid-template-columns: 1fr; margin-top: 20px; } .products { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px) { .products { grid-template-columns: 1fr; } header { padding-left: 20px; } }
   </style>
 </head>
 <body>
-  <h1>Kelola Produk</h1>
-  <p><a href="/">← Kembali ke katalog</a></p>
-  <form id="productForm">
-    <input name="name" placeholder="Nama produk" required>
-    <input name="price" type="number" min="0" placeholder="Harga" required>
-    <input name="category" placeholder="Kategori" required>
-    <input name="image" placeholder="URL gambar">
-    <button>Simpan</button>
-  </form>
-  <div id="products"><% products.forEach(product => { %>
-    <article class="product" data-id="<%= product.id %>">
-      <img src="<%= product.image || '/images/umy.jpeg' %>" alt="<%= product.name %>">
-      <div><strong><%= product.name %></strong><br><small><%= product.category %> · Rp <%= product.price.toLocaleString('id-ID') %></small></div>
-      <div class="actions"><button type="button" onclick="editProduct(<%= product.id %>)">Edit</button><button type="button" class="delete" onclick="deleteProduct(<%= product.id %>)">Hapus</button></div>
-    </article>
-  <% }) %></div>
+  <header><h1>ChatFlow UMKM</h1><p>Frontend sederhana untuk mengelola katalog produk.</p></header>
+  <main>
+    <section class="card">
+      <h2 id="formTitle">Tambah Produk</h2>
+      <form id="productForm">
+        <label for="category">Kategori</label><input id="category" name="category" placeholder="Contoh: Minuman" required>
+        <label for="name">Nama Produk</label><input id="name" name="name" placeholder="Contoh: Brownies Mini" required>
+        <label for="price">Harga</label><input id="price" name="price" type="number" min="0" placeholder="25000" required>
+        <label for="image">Gambar</label><input id="image" name="image" placeholder="/images/produk.jpg">
+        <button id="submitButton">Simpan Produk</button>
+      </form>
+    </section>
+    <section class="card">
+      <button class="reload" onclick="location.reload()">Muat Ulang</button><h2>Data Produk</h2>
+      <div class="products"><% products.forEach(product => { %>
+        <article class="product">
+          <img src="<%= product.image || '/images/umy.jpeg' %>" alt="<%= product.name %>">
+          <span class="category"><%= product.category %></span><h3><%= product.name %></h3>
+          <p>Produk UMKM pilihan untuk pelanggan.</p><span class="price">Rp <%= product.price.toLocaleString('id-ID') %></span>
+          <div class="actions"><button class="edit" type="button" onclick='editProduct(<%- JSON.stringify(product) %>)'>Edit</button><button type="button" onclick="deleteProduct(<%= product.id %>)">Hapus</button></div>
+        </article>
+      <% }) %></div>
+      <% if (!products.length) { %><p class="empty">Belum ada produk.</p><% } %>
+    </section>
+  </main>
   <script>
+    let editingId = null;
     const form = document.getElementById('productForm');
-    form.onsubmit = async event => { event.preventDefault(); const data = Object.fromEntries(new FormData(form)); const response = await fetch('/api/produk', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) }); if (!response.ok) return alert((await response.json()).message); location.reload(); };
-    async function editProduct(id) { const product = await fetch(`/api/produk/${id}`).then(response => response.json()); const name = prompt('Nama produk', product.name); if (name === null) return; const price = prompt('Harga', product.price); const category = prompt('Kategori', product.category); const image = prompt('URL gambar', product.image || ''); const response = await fetch(`/api/produk/${id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name, price, category, image}) }); if (!response.ok) return alert((await response.json()).message); location.reload(); }
-    async function deleteProduct(id) { if (!confirm('Hapus produk ini?')) return; const response = await fetch(`/api/produk/${id}`, { method: 'DELETE' }); if (!response.ok) return alert('Produk gagal dihapus'); location.reload(); }
+    form.onsubmit = async event => { event.preventDefault(); const data = Object.fromEntries(new FormData(form)); const response = await fetch(editingId ? `/api/produk/${editingId}` : '/api/produk', { method: editingId ? 'PUT' : 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) }); if (!response.ok) return alert((await response.json()).message); location.reload(); };
+    window.editProduct = product => { editingId = product.id; document.getElementById('formTitle').textContent = 'Edit Produk'; document.getElementById('submitButton').textContent = 'Simpan Perubahan'; ['category', 'name', 'price', 'image'].forEach(field => document.getElementById(field).value = product[field] || ''); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    window.deleteProduct = async id => { if (!confirm('Hapus produk ini?')) return; const response = await fetch(`/api/produk/${id}`, { method: 'DELETE' }); if (!response.ok) return alert('Produk gagal dihapus'); location.reload(); };
   </script>
 </body>
 </html>

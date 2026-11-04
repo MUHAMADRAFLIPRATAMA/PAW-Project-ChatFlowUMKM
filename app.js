@@ -20,8 +20,18 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Endpoint tidak ditemukan' });
 });
 
+app.use((error, req, res, next) => {
+  if (error.name === 'SequelizeValidationError') return res.status(400).json({ message: error.errors[0].message });
+  console.error(error);
+  res.status(500).json({ message: 'Terjadi kesalahan server' });
+});
+
 if (require.main === module) {
-  app.listen(port, '0.0.0.0', () => console.log(`Server berjalan di http://localhost:${port}`));
+  const productModel = require('./models/productModel');
+  productModel.sync().then(() => app.listen(port, '0.0.0.0', () => console.log(`Server berjalan di http://localhost:${port}`))).catch(error => {
+    console.error('Database gagal terhubung:', error.message);
+    process.exit(1);
+  });
 }
 
 module.exports = app;

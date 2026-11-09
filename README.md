@@ -98,3 +98,8 @@ npm test
 ```
 
 Aplikasi otomatis membuat tabel `products` melalui Sequelize dan mengisi tiga produk awal jika tabel masih kosong.
+
+
+
+<img width="1280" height="654" alt="image" src="https://github.com/user-attachments/assets/67dbf45f-820c-48fc-b4d1-55001f4f1aab" />
+

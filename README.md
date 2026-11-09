@@ -103,3 +103,6 @@ Aplikasi otomatis membuat tabel `products` melalui Sequelize dan mengisi tiga pr
 
 <img width="1280" height="654" alt="image" src="https://github.com/user-attachments/assets/67dbf45f-820c-48fc-b4d1-55001f4f1aab" />
 
+<img width="1280" height="603" alt="image" src="https://github.com/user-attachments/assets/37c5dfe1-2ff3-4d9a-b9a7-fcd605df62ee" />
+
+

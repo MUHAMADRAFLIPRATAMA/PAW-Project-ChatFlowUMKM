@@ -8,5 +8,4 @@ router.post('/produk', controller.createProduct);
 router.put('/produk/:id', controller.updateProduct);
 router.delete('/produk/:id', controller.deleteProduct);
 router.post('/pesanan/hitung', controller.calculateOrder);
-router.post('/chat', controller.chatGemini);
 module.exports = router;

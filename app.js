@@ -3,6 +3,7 @@ const path = require('path');
 const logger = require('./middlewares/logger');
 const webRoutes = require('./routes/webRoutes');
 const apiRoutes = require('./routes/apiRoutes');
+const chatRoutes = require('./routes/chat.routes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(logger);
+app.use('/api/chat', chatRoutes);
 app.use('/', webRoutes);
 app.use('/api', apiRoutes);
 

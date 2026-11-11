@@ -17,7 +17,10 @@ DB_PASS=password_postgres
 DB_HOST=localhost
 DB_PORT=5432
 PORT=3000
-GEMINI_API_KEY=isi_jika_menggunakan_chatbot
+GEMINI_API_KEY=isi_api_key_dari_google_ai_studio
+GEMINI_MODEL=gemini-flash-lite-latest
+GEMINI_TIMEOUT_MS=20000
+GEMINI_MAX_MESSAGE_LENGTH=500
 ```
 
 Pastikan PostgreSQL aktif dan database pada `DB_NAME` sudah dibuat.
@@ -78,17 +81,82 @@ Contoh menambah produk:
 }
 ```
 
+## AI Assistant (Google Gemini)
+
+Fitur AI Assistant memakai Google Gemini sebagai LLM, dipanggil **hanya dari backend Express**. API key disimpan di `.env` dan tidak pernah dikirim ke frontend.
+
+### Endpoint
+
+`POST /api/chat`
+
+```json
+{ "message": "Produk apa saja yang tersedia?" }
+```
+
+Response sukses:
+
+```json
+{ "success": true, "data": { "reply": "...", "model": "gemini-flash-lite-latest" } }
+```
+
+Response gagal (validasi atau layanan AI bermasalah):
+
+```json
+{ "success": false, "data": null, "message": "Pesan tidak boleh kosong." }
+```
+
+Field `history` bersifat opsional, berisi array `{ "role": "user" | "model", "text": "..." }` (maksimal 20 giliran terakhir).
+
+### Alur context
+
+1. `middlewares/validateChatInput.js` memvalidasi tipe, panjang (maks. 500 karakter), pesan kosong, dan menolak percobaan prompt injection.
+2. `services/gemini.service.js` mengambil data katalog dari database (`productModel.getAll()`) sebagai satu-satunya sumber context.
+3. Context katalog, penjelasan fitur aplikasi, ruang lingkup, dan aturan keamanan dirangkai menjadi system instruction.
+4. Jika database gagal dibaca, permintaan dihentikan dengan status 503 supaya AI tidak mengarang jawaban.
+
+### Batasan AI
+
+- Hanya menjawab seputar produk, harga, kategori, cara pemesanan, panduan, dan bantuan aplikasi.
+- Menolak pertanyaan di luar konteks, misalnya permintaan membuat kode program.
+- Tidak menyebut produk atau harga yang tidak ada di database.
+- Instruksi pengguna tidak dapat mengubah aturan sistem; backend juga memblokir pola prompt injection.
+
+### Pengujian manual
+
+```bash
+# sesuai context
+curl -X POST http://localhost:3000/api/chat -H "Content-Type: application/json" \
+  -d "{\"message\":\"Produk apa saja yang tersedia di aplikasi ini?\"}"
+
+# di luar context
+curl -X POST http://localhost:3000/api/chat -H "Content-Type: application/json" \
+  -d "{\"message\":\"Buatkan saya kode program untuk membuat game.\"}"
+
+# validasi input
+curl -X POST http://localhost:3000/api/chat -H "Content-Type: application/json" \
+  -d "{\"message\":\"   \"}"
+```
+
+
+
 ## Struktur utama
 
 ```text
 config/database.js              Konfigurasi PostgreSQL
-models/productModel.js           Model dan operasi CRUD produk
+config/gemini.js                Konfigurasi integrasi Google Gemini
+models/productModel.js          Model dan operasi CRUD produk
+services/gemini.service.js      Komunikasi dengan Gemini + penyusunan context katalog
 controllers/productController.js Controller API dan halaman produk
-routes/apiRoutes.js              Route API
-routes/webRoutes.js              Route halaman web
-views/index.ejs                  Katalog pelanggan
-views/products.ejs               Dashboard admin CRUD
-public/images/                   Gambar produk
+controllers/chat.controller.js  Controller AI Assistant
+middlewares/logger.js           Logger request
+middlewares/validateChatInput.js Validasi input chat dan penolakan prompt injection
+routes/apiRoutes.js             Route API produk
+routes/chat.routes.js           Route endpoint AI Assistant
+routes/webRoutes.js             Route halaman web
+views/index.ejs                 Katalog pelanggan + AI Assistant
+views/products.ejs              Dashboard admin CRUD
+public/images/                  Gambar produk
+tests/api.test.js               Pengujian endpoint produk dan chat
 ```
 
 ## Pengujian
@@ -97,7 +165,7 @@ public/images/                   Gambar produk
 npm test
 ```
 
-Aplikasi otomatis membuat tabel `products` melalui Sequelize dan mengisi tiga produk awal jika tabel masih kosong.
+Pengujian mencakup daftar produk, pesan kosong, tipe pesan yang salah, pesan melebihi batas, penolakan prompt injection, jawaban sesuai context, dan penolakan pertanyaan di luar context.
 
 
 

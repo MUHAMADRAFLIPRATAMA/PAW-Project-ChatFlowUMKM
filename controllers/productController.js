@@ -1,5 +1,4 @@
 const productModel = require('../models/productModel');
-const gemini = require('../utils/gemini');
 
 const fields = ['name', 'price', 'category', 'image'];
 const productData = body => Object.fromEntries(fields.filter(field => body[field] !== undefined).map(field => [field, body[field]]));
@@ -48,16 +47,4 @@ exports.renderAdmin = async (req, res, next) => {
 exports.calculateOrder = (req, res) => {
   const items = (req.body.items || []).map(item => ({ ...item, subtotal: item.price * item.quantity }));
   res.json({ items, total: items.reduce((sum, item) => sum + item.subtotal, 0) });
-};
-
-exports.chatGemini = async (req, res) => {
-  const message = typeof req.body.message === 'string' ? req.body.message.trim() : '';
-  if (!message) return res.status(400).json({ message: 'Pesan wajib diisi' });
-  if (message.length > 1000) return res.status(400).json({ message: 'Pesan maksimal 1000 karakter' });
-
-  try {
-    res.json(await gemini.ask(message, req.body.history));
-  } catch (error) {
-    res.status(error.status || 502).json({ message: error.message || 'Gagal menghubungi Gemini' });
-  }
 };
